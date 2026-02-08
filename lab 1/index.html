@@ -1,1 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Event Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- INTERNAL CSS -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #6fd3cf;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dashboard {
+      width: 900px;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .main-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      gap: 20px;
+    }
+
+    /* LEFT FORM */
+    #main-event-add-container {
+      width: 260px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 6px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    textarea {
+      height: 60px;
+    }
+
+    button {
+      margin-top: 12px;
+      width: 100%;
+      padding: 7px;
+      background: #4a79c9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* RIGHT EVENTS */
+    .events-box {
+      flex: 1;
+    }
+
+    .top-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .top-buttons button {
+      width: 50%;
+    }
+
+    #alleventcontainer div {
+      background: #f2f4f8;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      position: relative;
+    }
+
+    #alleventcontainer button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: auto;
+      padding: 2px 6px;
+      background: red;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard">
+
+    <h1>smart event dashboard</h1>
+
+    <div class="main-card">
+
+      <!-- LEFT -->
+      <div id="main-event-add-container">
+        <h3>add new event</h3>
+
+        <form>
+          <label>event title</label>
+          <input type="text" id="eventtitle" required>
+
+          <label>event date</label>
+          <input type="date" id="eventdate" required>
+
+          <label>category</label>
+          <select id="eventcategory">
+            <option>conference</option>
+            <option>workshop</option>
+            <option>meetup</option>
+            <option>webinar</option>
+            <option>social</option>
+          </select>
+
+          <label>description</label>
+          <textarea id="eventdescription"></textarea>
+
+          <button type="submit">add event</button>
+        </form>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="events-box">
+        <h3>my events</h3>
+
+        <div class="top-buttons">
+          <button id="clear-event-btn">clear all events</button>
+          <button id="add-sample-btn">add sample events</button>
+        </div>
+
+        <div id="alleventcontainer">
+          no event yet.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INTERNAL JS -->
+  <script>
+    let form = document.querySelector("form");
+    let title = document.querySelector("#eventtitle");
+    let date = document.querySelector("#eventdate");
+    let category = document.querySelector("#eventcategory");
+    let description = document.querySelector("#eventdescription");
+    let container = document.querySelector("#alleventcontainer");
+    let clearBtn = document.querySelector("#clear-event-btn");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      let card = document.createElement("div");
+
+      card.innerHTML = `
+        <button>x</button>
+        <h4>${title.value}</h4>
+        <span>${date.value}</span><br>
+        <span>${category.value}</span>
+        <p>${description.value}</p>
+      `;
+
+      container.append(card);
+      form.reset();
+    });
+
+    container.addEventListener("click", function (e) {
+      if (e.target.tagName === "BUTTON") {
+        e.target.parentElement.remove();
+      }
+    });
+
+    clearBtn.addEventListener("click", function () {
+      container.innerHTML = "<h4>no events yet.</h4>";
+    });
+  </script>
+
+</body>
+</html>
