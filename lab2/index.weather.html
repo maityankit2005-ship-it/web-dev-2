@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Async Weather Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #c3cfe2, #a1c4fd);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Floating soft glow background effect */
+body::before {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.3);
+    filter: blur(120px);
+    top: 10%;
+    left: 20%;
+    border-radius: 50%;
+}
+
+.container {
+    position: relative;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 30px;
+    border-radius: 25px;
+    width: 400px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+h1 {
+    color: #4a47a3;
+}
+
+input {
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #8e9eec;
+    width: 70%;
+    outline: none;
+}
+
+input:focus {
+    border-color: #4a47a3;
+    box-shadow: 0 0 5px #8e9eec;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: none;
+    background: #4a47a3;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #6c63ff;
+    transform: scale(1.05);
+}
+
+.history-item {
+    color: #4a47a3;
+    cursor: pointer;
+}
+
+.history-item:hover {
+    text-decoration: underline;
+}
+
+    </style>
+</head>
+<body>
+
+    <h1>🌤 ASYNC WEATHER TRACKER</h1>
+
+    <div class="container">
+
+        <form id="weather-form">
+            <input type="text" id="city" placeholder="Enter city (Delhi, London...)" required>
+            <button type="submit">Search</button>
+        </form>
+
+        <div id="weather-box"></div>
+
+        <div id="history-box">
+            <h4>Search History:</h4>
+            <div id="history-list"></div>
+        </div>
+
+    </div>
+
+<script>
+
+    const API_KEY = "2373a19df19f6474344b21759ee7c6fe"
+
+    const form = document.getElementById("weather-form")
+    const cityInput = document.getElementById("city")
+    const weatherBox = document.getElementById("weather-box")
+    const historyList = document.getElementById("history-list")
+
+    async function getWeather(cityName) {
+        try {
+
+            weatherBox.innerHTML = "Loading..."
+
+            const response = await fetch(
+                `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`
+            )
+
+            if (!response.ok) {
+                throw new Error("City not found")
+            }
+
+            const data = await response.json()
+
+            weatherBox.innerHTML = `
+                <h3>${data.name}, ${data.sys.country}</h3>
+                <p>🌡 Temperature: ${data.main.temp} °C</p>
+                <p>🌥 Weather: ${data.weather[0].description}</p>
+                <p>💧 Humidity: ${data.main.humidity}%</p>
+                <p>🌬 Wind Speed: ${data.wind.speed} m/s</p>
+            `
+
+            saveToHistory(cityName)
+
+        } catch (error) {
+            weatherBox.innerHTML = `<p class="error">${error.message}</p>`
+        }
+    }
+
+    function saveToHistory(cityName) {
+        let cities = JSON.parse(localStorage.getItem("cities")) || []
+
+        if (!cities.includes(cityName)) {
+            cities.push(cityName)
+            localStorage.setItem("cities", JSON.stringify(cities))
+        }
+
+        displayHistory()
+    }
+
+    function displayHistory() {
+        let cities = JSON.parse(localStorage.getItem("cities")) || []
+
+        historyList.innerHTML = ""
+
+        cities.forEach(city => {
+            const div = document.createElement("div")
+            div.textContent = city
+            div.classList.add("history-item")
+
+            div.addEventListener("click", () => {
+                getWeather(city)
+            })
+
+            historyList.appendChild(div)
+        })
+    }
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault()
+        const cityName = cityInput.value.trim()
+        if (cityName !== "") {
+            getWeather(cityName)
+            cityInput.value = ""
+        }
+    })
+
+    displayHistory()
+
+</script>
+
+</body>
+</html>
